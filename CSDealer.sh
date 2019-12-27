@@ -34,8 +34,8 @@ fi
     color14=$(xrdb -query | grep 'color14:'| awk '{print $2; exit}')
     color7=$(xrdb -query | grep 'color7:'| awk '{print $2; exit}')
     color15=$(xrdb -query | grep 'color15:'| awk '{print $2; exit}')
-    
-    
+
+
 for i in $( find "$TEMPLATES_DIR" -type f ); do
 
     home=$( echo $HOME | sed 's/\//\\\//g')
@@ -44,8 +44,6 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
     if [ "$tempDir" != "" ]
     then
         content=$( cat $i )
-
-        # analyze variables in current template and replace them with values
 
         # replace tags with values in current template
         echo "$content" | sed -r \
@@ -72,4 +70,3 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         > $tempDir
     fi
 done
-
