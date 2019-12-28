@@ -54,3 +54,4 @@ When executed, CSDealer process every file in `/template` folder (even if there 
 ## Notice
 
 - You can declare `CSDdir` with absolute path or using `~`, the script will recognize it anyway.
+- It works only with **.Xresources** file, because **CSD** uses `xrdb -query` command to gather color values.
