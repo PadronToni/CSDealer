@@ -4,9 +4,10 @@ A simple bash script that updates your config files with Xresources color scheme
 
 
 
+
 ### Usage
 
-Put a copy of your config file in `/template` folder and substitute color and font values with default tags. 
+Place a copy of your config file in `/template` folder and substitute color and font values with default tags.
 
 Available tags:
 
@@ -41,14 +42,12 @@ example:
 Insert directory where your template should be printed, with this syntax:
 
 ```
-// CSDdir:~/path/to/file/generatedFileName 
+// CSDdir:~/path/to/file/generatedFileName
 ```
 
 There are some template example in `/template` folder
 
 
 
+
 When executed, CSDealer process every file in `/template` folder (even if there are sub-directories)  that has `CSDdir` directory declared .
-
-
-
