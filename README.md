@@ -3,7 +3,7 @@
 A simple bash script that updates your config files with Xresources color scheme and font (for now).
 
 
-## Usage
+## How to use
 
 Place a copy of your config file in `/template` folder and substitute color and font values with default tags.
 
@@ -34,6 +34,8 @@ example:
     border-color:               <bg>;
     fontSize:                   8;
     font:                       "<font> @fontSize";
+}
+
 ...
 ```
 
@@ -48,3 +50,7 @@ There are some template example in `/template` folder
 ## Execution
 
 When executed, CSDealer process every file in `/template` folder (even if there are sub-directories)  that has `CSDdir` directory declared.
+
+## Notice
+
+- You can declare `CSDdir` with absolute path or using `~`, the script will recognize it anyway.
