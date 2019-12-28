@@ -2,8 +2,7 @@
 
 A simple bash script that updates your config files with Xresources color scheme and font (for now).
 
-
-
+#  
 
 ### Usage
 
@@ -11,7 +10,7 @@ Place a copy of your config file in `/template` folder and substitute color and 
 
 Available tags:
 
-```bash
+```text
 <bg> # background color
 <fg> # foreground color
 <color0> # base16 color 0 Xresources color
@@ -35,7 +34,7 @@ example:
     background-color:           transparent;
     border-color:               <bg>;
     fontSize:                   8;
-  	font:                       "<font> @fontSize";
+    font:                       "<font> @fontSize";
 ...
 ```
 
@@ -47,7 +46,6 @@ Insert directory where your template should be printed, with this syntax:
 
 There are some template example in `/template` folder
 
-
-
+#  
 
 When executed, CSDealer process every file in `/template` folder (even if there are sub-directories)  that has `CSDdir` directory declared .
