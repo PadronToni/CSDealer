@@ -49,6 +49,7 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         echo "$content" | sed -r \
         -e '/CSDdir/d' \
         -e "s/<font>/$font/g" \
+        -e "s/<fontBold>/$fontBold/g" \
         -e "s/<fg>/$foreground/g" \
         -e "s/<bg>/$background/g" \
         -e "s/<color0>/$color0/g" \
