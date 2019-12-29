@@ -4,37 +4,35 @@
 CUR_DIR=$( dirname "$(readlink -f "$0")" )
 TEMPLATES_DIR="$CUR_DIR/templates"
 
+# Checks if template dir exist, if not, exit
 if [ ! -d $TEMPLATES_DIR ]
 then
     echo "Error: cannot find any \"templates\" directory"
     exit 0
 fi
 
-
-# Font
-    font=$(xrdb -query | grep 'font-regular:'| awk '{print $2, $3; exit}')
-    fontBold=$(xrdb -query | grep 'font-bold:'| awk '{print $2, $3; exit}')
-
-# Colors, takes color variables from Xresources file
-    foreground=$(xrdb -query | grep 'foreground:'| awk '{print $2; exit}')
-    background=$(xrdb -query | grep 'background:'| awk '{print $2; exit}')
-    color0=$(xrdb -query | grep 'color0:'| awk '{print $2; exit}')
-    color8=$(xrdb -query | grep 'color8:'| awk '{print $2; exit}')
-    color1=$(xrdb -query | grep 'color1:'| awk '{print $2; exit}')
-    color9=$(xrdb -query | grep 'color9:'| awk '{print $2; exit}')
-    color2=$(xrdb -query | grep 'color2:'| awk '{print $2; exit}')
-    color10=$(xrdb -query | grep 'color10:'| awk '{print $2; exit}')
-    color3=$(xrdb -query | grep 'color3:'| awk '{print $2; exit}')
-    color11=$(xrdb -query | grep 'color11:'| awk '{print $2; exit}')
-    color4=$(xrdb -query | grep 'color4:'| awk '{print $2; exit}')
-    color12=$(xrdb -query | grep 'color12:'| awk '{print $2; exit}')
-    color5=$(xrdb -query | grep 'color5:'| awk '{print $2; exit}')
-    color13=$(xrdb -query | grep 'color13:'| awk '{print $2; exit}')
-    color6=$(xrdb -query | grep 'color6:'| awk '{print $2; exit}')
-    color14=$(xrdb -query | grep 'color14:'| awk '{print $2; exit}')
-    color7=$(xrdb -query | grep 'color7:'| awk '{print $2; exit}')
-    color15=$(xrdb -query | grep 'color15:'| awk '{print $2; exit}')
-
+# Takes values from Xresources file
+xres=$( xrdb -query )
+font=$(echo $xres | grep 'font-regular:'| awk '{print $2, $3; exit}')
+fontBold=$(echo $xres | grep 'font-bold:'| awk '{print $2, $3; exit}')
+foreground=$(echo $xres | grep 'foreground:'| awk '{print $2; exit}')
+background=$(echo $xres | grep 'background:'| awk '{print $2; exit}')
+color0=$(echo $xres | grep 'color0:'| awk '{print $2; exit}')
+color8=$(echo $xres | grep 'color8:'| awk '{print $2; exit}')
+color1=$(echo $xres | grep 'color1:'| awk '{print $2; exit}')
+color9=$(echo $xres | grep 'color9:'| awk '{print $2; exit}')
+color2=$(echo $xres | grep 'color2:'| awk '{print $2; exit}')
+color10=$(echo $xres | grep 'color10:'| awk '{print $2; exit}')
+color3=$(echo $xres | grep 'color3:'| awk '{print $2; exit}')
+color11=$(echo $xres | grep 'color11:'| awk '{print $2; exit}')
+color4=$(echo $xres | grep 'color4:'| awk '{print $2; exit}')
+color12=$(echo $xres | grep 'color12:'| awk '{print $2; exit}')
+color5=$(echo $xres | grep 'color5:'| awk '{print $2; exit}')
+color13=$(echo $xres | grep 'color13:'| awk '{print $2; exit}')
+color6=$(echo $xres | grep 'color6:'| awk '{print $2; exit}')
+color14=$(echo $xres | grep 'color14:'| awk '{print $2; exit}')
+color7=$(echo $xres | grep 'color7:'| awk '{print $2; exit}')
+color15=$(echo $xres | grep 'color15:'| awk '{print $2; exit}')
 
 for i in $( find "$TEMPLATES_DIR" -type f ); do
 
@@ -43,10 +41,9 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
 
     if [ "$tempDir" != "" ]
     then
-        content=$( cat $i )
 
-        # replace tags with values in current template
-        echo "$content" | sed -r \
+        # Replaces tags with values in current template
+        cat "$i" | sed -r \
         -e '/CSDdir/d' \
         -e "s/<font>/$font/g" \
         -e "s/<fontBold>/$fontBold/g" \
