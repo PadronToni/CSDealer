@@ -72,15 +72,15 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/<color15>/$color15/g" )
 
         # Stores local all local variables, if present
-        sas=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
+        vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
 
         # Checks if local variables are present
-        if [ -n "$sas" ]
+        if [ -n "$vars" ]
         then
             # Creates sed's arguments
-            sassico=$( echo "$sas" | awk -F ':' '{ print "-e s/@"$1"/"$2"/g " }' )
+            sedArguments=$( echo "$vars" | awk -F ':' '{ print "-e s/@"$1"/"$2"/g " }' )
             # Applies all variables to file content
-            content=$( echo "$content" | sed -e "/var /d" $sassico )
+            content=$( echo "$content" | sed -e "/var /d" $sedArguments )
         fi
         # Writes modified content in the specified directory
         echo "$content" > $tempDir
