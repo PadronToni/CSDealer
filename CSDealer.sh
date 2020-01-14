@@ -34,10 +34,11 @@ color14=$(echo "$xres" | awk ' /color14:/ {print $2; exit}')
 color7=$(echo "$xres" | awk ' /color7:/ {print $2; exit}')
 color15=$(echo "$xres" | awk ' /color15:/ {print $2; exit}')
 
+
 for i in $( find "$TEMPLATES_DIR" -type f ); do
 
     home=$( echo $HOME | sed 's/\//\\\//g')
-    tempDir=$( awk -F':' '$1 == "// CSDdir" { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
+    tempDir=$( awk -F':' '/CSDdir/ { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
 
     if [ "$tempDir" != "" ]
     then
@@ -68,14 +69,13 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/<color7>/$color7/g" \
         -e "s/<color15>/$color15/g" )
 
-        # Replaces local variables
-        for sas in $( echo "$content" | awk ' /var/ { print $2.$3 }' ); do
+        sas=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
 
-           content=$( echo "$content" | sed -e $( echo "$sas" | awk -F ':' '{ print "s/@"$1"/"$2"/g" }' ) )
-
-        done
-        content=$( echo "$content" | sed -e "/var /d" )
-
+        if [ -n "$sas" ]
+        then
+            sassico=$( echo "$sas" | awk -F ':' '{ print "-e s/@"$1"/"$2"/g " }' )
+            content=$( echo "$content" | sed -e "/var /d" $sassico )
+        fi
         echo "$content" > $tempDir
 
     fi
