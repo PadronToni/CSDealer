@@ -13,37 +13,42 @@ fi
 
 # Takes values from Xresources file
 xres=$( xrdb -query )
-font=$(echo $xres | grep 'font-regular:'| awk '{print $2, $3; exit}')
-fontBold=$(echo $xres | grep 'font-bold:'| awk '{print $2, $3; exit}')
-foreground=$(echo $xres | grep 'foreground:'| awk '{print $2; exit}')
-background=$(echo $xres | grep 'background:'| awk '{print $2; exit}')
-color0=$(echo $xres | grep 'color0:'| awk '{print $2; exit}')
-color8=$(echo $xres | grep 'color8:'| awk '{print $2; exit}')
-color1=$(echo $xres | grep 'color1:'| awk '{print $2; exit}')
-color9=$(echo $xres | grep 'color9:'| awk '{print $2; exit}')
-color2=$(echo $xres | grep 'color2:'| awk '{print $2; exit}')
-color10=$(echo $xres | grep 'color10:'| awk '{print $2; exit}')
-color3=$(echo $xres | grep 'color3:'| awk '{print $2; exit}')
-color11=$(echo $xres | grep 'color11:'| awk '{print $2; exit}')
-color4=$(echo $xres | grep 'color4:'| awk '{print $2; exit}')
-color12=$(echo $xres | grep 'color12:'| awk '{print $2; exit}')
-color5=$(echo $xres | grep 'color5:'| awk '{print $2; exit}')
-color13=$(echo $xres | grep 'color13:'| awk '{print $2; exit}')
-color6=$(echo $xres | grep 'color6:'| awk '{print $2; exit}')
-color14=$(echo $xres | grep 'color14:'| awk '{print $2; exit}')
-color7=$(echo $xres | grep 'color7:'| awk '{print $2; exit}')
-color15=$(echo $xres | grep 'color15:'| awk '{print $2; exit}')
+font=$(echo "$xres" | awk ' /font-regular:/ {print $2, $3; exit}')
+fontBold=$(echo "$xres" | awk ' /font-bold:/ {print $2, $3; exit}')
+foreground=$(echo "$xres" | awk ' /foreground:/ {print $2; exit}')
+background=$(echo "$xres" | awk ' /background:/ {print $2; exit}')
+color0=$(echo "$xres" | awk ' /color0:/ {print $2; exit}')
+color8=$(echo "$xres" | awk ' /color8:/ {print $2; exit}')
+color1=$(echo "$xres" | awk ' /color1:/ {print $2; exit}')
+color9=$(echo "$xres" | awk ' /color9:/ {print $2; exit}')
+color2=$(echo "$xres" | awk ' /color2:/ {print $2; exit}')
+color10=$(echo "$xres" | awk ' /color10:/ {print $2; exit}')
+color3=$(echo "$xres" | awk ' /color3:/ {print $2; exit}')
+color11=$(echo "$xres" | awk ' /color11:/ {print $2; exit}')
+color4=$(echo "$xres" | awk ' /color4:/ {print $2; exit}')
+color12=$(echo "$xres" | awk ' /color12:/ {print $2; exit}')
+color5=$(echo "$xres" | awk ' /color5:/ {print $2; exit}')
+color13=$(echo "$xres" | awk ' /color13:/ {print $2; exit}')
+color6=$(echo "$xres" | awk ' /color6:/ {print $2; exit}')
+color14=$(echo "$xres" | awk ' /color14:/ {print $2; exit}')
+color7=$(echo "$xres" | awk ' /color7:/ {print $2; exit}')
+color15=$(echo "$xres" | awk ' /color15:/ {print $2; exit}')
 
+# Go through every file in template directory
 for i in $( find "$TEMPLATES_DIR" -type f ); do
 
+    # Extracts CSDdir from the current file and if it finds `~` replaces it with home directory
     home=$( echo $HOME | sed 's/\//\\\//g')
-    tempDir=$( awk -F':' '$1 == "// CSDdir" { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
+    tempDir=$( awk -F':' '/CSDdir/ { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
 
+    # Checks if the current file is a template
     if [ "$tempDir" != "" ]
     then
 
+        content=$( cat "$i" )
+
         # Replaces tags with values in current template
-        cat "$i" | sed -r \
+        content=$( echo "$content" | sed \
         -e '/CSDdir/d' \
         -e "s/<font>/$font/g" \
         -e "s/<fontBold>/$fontBold/g" \
@@ -64,7 +69,21 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/<color6>/$color6/g" \
         -e "s/<color14>/$color14/g" \
         -e "s/<color7>/$color7/g" \
-        -e "s/<color15>/$color15/g" \
-        > $tempDir
+        -e "s/<color15>/$color15/g" )
+
+        # Stores local all local variables, if present
+        vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
+
+        # Checks if local variables are present
+        if [ -n "$vars" ]
+        then
+            # Creates sed's arguments
+            sedArguments=$( echo "$vars" | awk -F ':' '{ print "-e s/@"$1"/"$2"/g " }' )
+            # Applies all variables to file content
+            content=$( echo "$content" | sed -e "/var /d" $sedArguments )
+        fi
+        # Writes modified content in the specified directory
+        echo "$content" > $tempDir
+
     fi
 done

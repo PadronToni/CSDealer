@@ -1,7 +1,11 @@
 // CSDdir:~/.config/rofi/config.rasi
 
-*var radius     6px
-*var mar        5px
+var radius:     6px
+var mar:        5px
+var pad:        15px
+var inMar:      20px
+var inPad:      10px
+var fontSize:   8
 
 configuration {
 	combi-modi:     "drun,run";
@@ -24,7 +28,6 @@ configuration {
     text-color:                 <fg>;
     background-color:           transparent;
     border-color:               <bg>;
-    fontSize:                   8;
   	font:                       "<font> @fontSize";
     highlight:                  bold underline ;
 
@@ -70,7 +73,7 @@ configuration {
 //  Inputbar  ----------------------------------------------
 
 #inputbarBorder {
-    margin:             %mar;
+    margin:             @mar;
     orientation:        horizontal;
     expand:             false;
     children: [  dummy, inputbar, dummy ];
@@ -82,7 +85,7 @@ configuration {
     children:   [ textbox-search, entry ];
 }
 #case-indicator {
-    margin:             0 %mar 0 0;
+    margin:             0 @mar 0 0;
 }
 #entry {
     expand:             true;
@@ -121,7 +124,7 @@ configuration {
 
 //  Listview    --------------------------------------------
 listview {
-    margin:             0 %mar %mar %mar;
+    margin:             0 @mar @mar @mar;
     border-radius:      @radius;
     background-color:   @semitraBg;
 }
@@ -163,7 +166,7 @@ listview {
 }
 
 #message {
-    margin:             %mar;
+    margin:             @mar;
     padding:            @pad;
     border-radius:      @radius;
     background-color:   @defaultBg;
