@@ -50,35 +50,35 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         # Replaces tags with values in current template
         content=$( echo "$content" | sed \
         -e '/CSDdir/d' \
-        -e "s/<font>/$font/g" \
-        -e "s/<fontBold>/$fontBold/g" \
-        -e "s/<fg>/$foreground/g" \
-        -e "s/<bg>/$background/g" \
-        -e "s/<color0>/$color0/g" \
-        -e "s/<color8>/$color8/g" \
-        -e "s/<color1>/$color1/g" \
-        -e "s/<color9>/$color9/g" \
-        -e "s/<color2>/$color2/g" \
-        -e "s/<color10>/$color10/g" \
-        -e "s/<color3>/$color3/g" \
-        -e "s/<color11>/$color11/g" \
-        -e "s/<color4>/$color4/g" \
-        -e "s/<color12>/$color12/g" \
-        -e "s/<color5>/$color5/g" \
-        -e "s/<color13>/$color13/g" \
-        -e "s/<color6>/$color6/g" \
-        -e "s/<color14>/$color14/g" \
-        -e "s/<color7>/$color7/g" \
-        -e "s/<color15>/$color15/g" )
+        -e "s/@font@/$font/g" \
+        -e "s/@fontBold@/$fontBold/g" \
+        -e "s/@fg@/$foreground/g" \
+        -e "s/@bg@/$background/g" \
+        -e "s/@color15@/$color15/g" \
+        -e "s/@color14@/$color14/g" \
+        -e "s/@color13@/$color13/g" \
+        -e "s/@color12@/$color12/g" \
+        -e "s/@color11@/$color11/g" \
+        -e "s/@color10@/$color10/g" \
+        -e "s/@color9@/$color9/g" \
+        -e "s/@color8@/$color8/g" \
+        -e "s/@color7@/$color7/g" \
+        -e "s/@color6@/$color6/g" \
+        -e "s/@color5@/$color5/g" \
+        -e "s/@color4@/$color4/g" \
+        -e "s/@color3@/$color3/g" \
+        -e "s/@color2@/$color2/g" \
+        -e "s/@color1@/$color1/g" \
+        -e "s/@color0@/$color0/g" )
 
         # Stores local all local variables, if present
-        vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
+        lvars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
 
         # Checks if local variables are present
-        if [ -n "$vars" ]
+        if [ -n "$lvars" ]
         then
             # Creates sed's arguments
-            sedArguments=$( echo "$vars" | awk -F ':' '{ print "-e s/@"$1"/"$2"/g " }' )
+            sedArguments=$( echo "$lvars" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
             # Applies all variables to file content
             content=$( echo "$content" | sed -e "/var /d" $sedArguments )
         fi
