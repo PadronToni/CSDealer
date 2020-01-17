@@ -36,7 +36,7 @@ color7=$(echo "$xres" | awk ' /color7:/ {print $2; exit}')
 color15=$(echo "$xres" | awk ' /color15:/ {print $2; exit}')
 
 
-# Get global variables
+# Gets global variables, if present
 g_vars=$( cat $INDEX | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;p}' | awk -F'=' '/=/ {print $1" "$2}' )
 
 # Go through every file in template directory
@@ -44,10 +44,10 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
 
     # Extracts CSDdir from the current file and if it finds `~` replaces it with home directory
     home=$( echo $HOME | sed 's/\//\\\//g')
-    temp_dir=$( awk -F':' '/CSDdir/ { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
+    csd_dir=$( awk -F':' '/CSDdir/ { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
 
     # Checks if the current file is a template
-    if [ "$temp_dir" != "" ]
+    if [ "$csd_dir" != "" ]
     then
 
         content=$( cat "$i" )
@@ -76,7 +76,7 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/@color1@/$color1/g" \
         -e "s/@color0@/$color0/g" )
 
-        # Stores local all local variables, if present
+        # Gets local variables, if present
         l_vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
 
         # Checks if local variables are present
@@ -98,8 +98,6 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         fi
 
         # Writes modified content in the specified directory
-        echo "$content" > $temp_dir
-        echo "$g_vars"
-
+        echo "$content" > $csd_dir
     fi
 done
