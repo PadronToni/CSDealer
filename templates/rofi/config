@@ -1,18 +1,12 @@
 // CSDdir:~/.config/rofi/config.rasi
 
-var radius:     6px
-var mar:        5px
-var pad:        15px
-var inMar:      20px
-var inPad:      10px
-var fontSize:   8
 
 configuration {
 	combi-modi:     "drun,run";
 	sidebar-mode:   false;
     show-icons:     false;
 
-//  Those change the "modi" names displayed 
+//  Those change the "modi" names displayed
 	display-combi:        "舘";
 	display-window:       "舘";
 	display-run:          " ";
@@ -170,4 +164,3 @@ listview {
     border-radius:      @radius@;
     background-color:   @defaultBg;
 }
-

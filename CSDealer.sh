@@ -2,7 +2,8 @@
 
 # Dirs
 CUR_DIR=$( dirname "$(readlink -f "$0")" )
-TEMPLATES_DIR="$CUR_DIR/templates"
+TEMPLATES_DIR=$CUR_DIR/templates
+INDEX=$CUR_DIR/index.ini
 
 # Checks if template dir exist, if not, exit
 if [ ! -d $TEMPLATES_DIR ]
@@ -34,15 +35,19 @@ color14=$(echo "$xres" | awk ' /color14:/ {print $2; exit}')
 color7=$(echo "$xres" | awk ' /color7:/ {print $2; exit}')
 color15=$(echo "$xres" | awk ' /color15:/ {print $2; exit}')
 
+
+# Get global variables
+g_vars=$( cat $INDEX | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;p}' | awk -F'=' '/=/ {print $1" "$2}' )
+
 # Go through every file in template directory
 for i in $( find "$TEMPLATES_DIR" -type f ); do
 
     # Extracts CSDdir from the current file and if it finds `~` replaces it with home directory
     home=$( echo $HOME | sed 's/\//\\\//g')
-    tempDir=$( awk -F':' '/CSDdir/ { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
+    temp_dir=$( awk -F':' '/CSDdir/ { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
 
     # Checks if the current file is a template
-    if [ "$tempDir" != "" ]
+    if [ "$temp_dir" != "" ]
     then
 
         content=$( cat "$i" )
@@ -72,18 +77,29 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/@color0@/$color0/g" )
 
         # Stores local all local variables, if present
-        lvars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
+        l_vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
 
         # Checks if local variables are present
-        if [ -n "$lvars" ]
+        if [ -n "$l_vars" ]
         then
             # Creates sed's arguments
-            sedArguments=$( echo "$lvars" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
+            sed_args=$( echo "$l_vars" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
             # Applies all variables to file content
-            content=$( echo "$content" | sed -e "/var /d" $sedArguments )
+            content=$( echo "$content" | sed -e "/var\s/d" $sed_args )
         fi
+
+        # Checks if global variables exists
+        if [ -n "$g_vars" ]
+        then
+            # Creates sed's arguments
+            sed_args=$( echo "$g_vars" | awk '{ print "-e s/@"$1"@/"$2"/g " }' )
+            # Applies all variables to file content
+            content=$( echo "$content" | sed $sed_args )
+        fi
+
         # Writes modified content in the specified directory
-        echo "$content" > $tempDir
+        echo "$content" > $temp_dir
+        echo "$g_vars"
 
     fi
 done
