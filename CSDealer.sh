@@ -37,7 +37,7 @@ color15=$(echo "$xres" | awk ' /color15:/ {print $2; exit}')
 
 
 # Gets global variables, if present
-g_vars=$( cat $INDEX | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;p}' | awk -F'=' '/=/ {print $1" "$2}' )
+g_vars=$( cat $INDEX | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}' | awk -F'=' '/=/ {print $1" "$2}' )
 
 # Go through every file in template directory
 for i in $( find "$TEMPLATES_DIR" -type f ); do
