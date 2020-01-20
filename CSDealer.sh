@@ -16,6 +16,9 @@ fi
 # FUNCTIONS
 # ==============
 
+get_vars () {
+  cat $1 | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}' | awk -F'=' '/=/ {print $1" "$2}'
+}
 apply_l_vars () {
   # Checks if local variables are present
   if [ -n "$1" ]
@@ -69,7 +72,7 @@ color15=$(echo "$xres" | awk ' /color15:/ {print $2; exit}')
 
 
 # Gets global variables, if present
-g_vars=$( cat $INDEX | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}' | awk -F'=' '/=/ {print $1" "$2}' )
+g_vars=$( get_vars $INDEX )
 
 # Go through every file in template directory
 for i in $( find "$TEMPLATES_DIR" -type f ); do
