@@ -16,23 +16,17 @@ fi
 # FUNCTIONS
 # ==============
 
+# Extracts CSDdir from the current file and if it finds `~` replaces it with home directory
+get_csd_dir () {
+  local home=$( echo $HOME | sed 's/\//\\\//g')
+  awk '/CSDdir *= */ { print $3; exit }' "$1" | sed -e "s/~/$home/g"
+}
+
 get_vars () {
   cat $1 | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}' | awk -F'=' '/=/ {print $1" "$2}'
 }
-apply_l_vars () {
-  # Checks if local variables are present
-  if [ -n "$1" ]
-  then
-      # Creates sed's arguments
-      local sed_args=$( echo "$1" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
-      # Applies all variables to file content
-      echo "$2" | sed -e "/var\s/d" $sed_args
-  else
-      echo "$2"
-  fi
-}
 
-apply_g_vars () {
+apply_vars () {
   # Checks if global variables exists
   if [ -n "$1" ]
   then
@@ -45,6 +39,10 @@ apply_g_vars () {
   fi
 }
 
+# Prints only content section of piped stream
+content_sec () {
+  read | sed -n '/\[content\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}'
+}
 # ==============
 
 # Takes values from Xresources file
@@ -77,19 +75,18 @@ g_vars=$( get_vars $INDEX )
 # Go through every file in template directory
 for i in $( find "$TEMPLATES_DIR" -type f ); do
 
-    # Extracts CSDdir from the current file and if it finds `~` replaces it with home directory
-    home=$( echo $HOME | sed 's/\//\\\//g')
-    csd_dir=$( awk -F':' '/CSDdir/ { print $2; exit }' "$i" | sed -e "s/~/$home/g" )
+    # Gets CDSdir, the diretcory where should be written the file
+    csd_dir=$( get_csd_dir "$i" )
 
     # Checks if the current file is a template
-    if [ "$csd_dir" != "" ]
+    if [ -n "$csd_dir" ]
     then
 
         content=$( cat "$i" )
 
         # Replaces tags with values in current template
         content=$( echo "$content" | sed \
-        -e '/CSDdir/d' \
+        -e '/CSDdir *= */d' \
         -e "s/@font@/$font/g" \
         -e "s/@fontBold@/$fontBold/g" \
         -e "s/@fg@/$foreground/g" \
@@ -112,15 +109,15 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/@color0@/$color0/g" )
 
         # Applies global variables to content
-        content=$( apply_g_vars "$g_vars" "$content" )
+        content=$( apply_vars "$g_vars" "$content" )
 
         # Gets local variables, if present
-        l_vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
+        l_vars=$( get_vars "$content" )
 
         # Applies local variables to content
-        content=$( apply_l_vars "$l_vars" "$content" )
+        content=$( apply_vars "$l_vars" "$content" )
 
-        # Writes modified content in the specified directory
-        echo "$content" > $csd_dir
+        # Writes sanitised content in the specified directory
+        echo "$content" | content_sec > $csd_dir
     fi
 done
