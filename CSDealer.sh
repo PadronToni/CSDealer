@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Dirs
+# Dirs & files
 CUR_DIR=$( dirname "$(readlink -f "$0")" )
 TEMPLATES_DIR=$CUR_DIR/templates
 INDEX=$CUR_DIR/index.ini
@@ -11,6 +11,38 @@ then
     echo "Error: cannot find any \"templates\" directory"
     exit 0
 fi
+
+# ==============
+# FUNCTIONS
+# ==============
+
+apply_l_vars () {
+  # Checks if local variables are present
+  if [ -n "$1" ]
+  then
+      # Creates sed's arguments
+      local sed_args=$( echo "$1" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
+      # Applies all variables to file content
+      echo "$2" | sed -e "/var\s/d" $sed_args
+  else
+      echo "$2"
+  fi
+}
+
+apply_g_vars () {
+  # Checks if global variables exists
+  if [ -n "$1" ]
+  then
+      # Creates sed's arguments
+      local sed_args=$( echo "$1" | awk '{ print "-e s/@"$1"@/"$2"/g " }' )
+      # Applies all variables to file content
+      echo "$2" | sed $sed_args
+  else
+      echo "$2"
+  fi
+}
+
+# ==============
 
 # Takes values from Xresources file
 xres=$( xrdb -query )
@@ -79,23 +111,25 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         # Gets local variables, if present
         l_vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
 
-        # Checks if local variables are present
-        if [ -n "$l_vars" ]
-        then
-            # Creates sed's arguments
-            sed_args=$( echo "$l_vars" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
-            # Applies all variables to file content
-            content=$( echo "$content" | sed -e "/var\s/d" $sed_args )
-        fi
+        content=$( apply_l_vars "$l_vars" "$content" )
+        # # Checks if local variables are present
+        # if [ -n "$l_vars" ]
+        # then
+        #     # Creates sed's arguments
+        #     sed_args=$( echo "$l_vars" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
+        #     # Applies all variables to file content
+        #     content=$( echo "$content" | sed -e "/var\s/d" $sed_args )
+        # fi
 
-        # Checks if global variables exists
-        if [ -n "$g_vars" ]
-        then
-            # Creates sed's arguments
-            sed_args=$( echo "$g_vars" | awk '{ print "-e s/@"$1"@/"$2"/g " }' )
-            # Applies all variables to file content
-            content=$( echo "$content" | sed $sed_args )
-        fi
+        content=$( apply_g_vars "$g_vars" "$content" )
+        # # Checks if global variables exists
+        # if [ -n "$g_vars" ]
+        # then
+        #     # Creates sed's arguments
+        #     sed_args=$( echo "$g_vars" | awk '{ print "-e s/@"$1"@/"$2"/g " }' )
+        #     # Applies all variables to file content
+        #     content=$( echo "$content" | sed $sed_args )
+        # fi
 
         # Writes modified content in the specified directory
         echo "$content" > $csd_dir
