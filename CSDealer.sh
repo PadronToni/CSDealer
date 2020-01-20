@@ -108,28 +108,14 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/@color1@/$color1/g" \
         -e "s/@color0@/$color0/g" )
 
+        # Applies global variables to content
+        content=$( apply_g_vars "$g_vars" "$content" )
+
         # Gets local variables, if present
         l_vars=$( echo "$content" | awk ' /var/ { print $2.$3 }' )
 
+        # Applies local variables to content
         content=$( apply_l_vars "$l_vars" "$content" )
-        # # Checks if local variables are present
-        # if [ -n "$l_vars" ]
-        # then
-        #     # Creates sed's arguments
-        #     sed_args=$( echo "$l_vars" | awk -F ':' '{ print "-e s/@"$1"@/"$2"/g " }' )
-        #     # Applies all variables to file content
-        #     content=$( echo "$content" | sed -e "/var\s/d" $sed_args )
-        # fi
-
-        content=$( apply_g_vars "$g_vars" "$content" )
-        # # Checks if global variables exists
-        # if [ -n "$g_vars" ]
-        # then
-        #     # Creates sed's arguments
-        #     sed_args=$( echo "$g_vars" | awk '{ print "-e s/@"$1"@/"$2"/g " }' )
-        #     # Applies all variables to file content
-        #     content=$( echo "$content" | sed $sed_args )
-        # fi
 
         # Writes modified content in the specified directory
         echo "$content" > $csd_dir
