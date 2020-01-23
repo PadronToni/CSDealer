@@ -23,25 +23,25 @@ get_csd_dir () {
 }
 
 get_vars () {
-  cat $1 | sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}' | awk -F'=' '/=/ {print $1" "$2}'
+  sed -n '/\[variables\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}' | awk -F'=' '/=/ {print $1" "$2}' < /dev/stdin
 }
 
 apply_vars () {
-  # Checks if global variables exists
+  # Checks if variables exists
   if [ -n "$1" ]
   then
       # Creates sed's arguments
       local sed_args=$( echo "$1" | awk '{ print "-e s/@"$1"@/"$2"/g " }' )
       # Applies all variables to file content
-      echo "$2" | sed $sed_args
+      sed $sed_args < /dev/stdin
   else
-      echo "$2"
+      cat /dev/stdin
   fi
 }
 
 # Prints only content section of piped stream
 content_sec () {
-  read | sed -n '/\[content\]/,/\[.*\]/{/\[.*\]/b;/^;.*/b;p}'
+  sed -n '/\[content\]/,//{/\[content\]/b;p}' < /dev/stdin
 }
 # ==============
 
@@ -70,7 +70,7 @@ color15=$(echo "$xres" | awk ' /color15:/ {print $2; exit}')
 
 
 # Gets global variables, if present
-g_vars=$( get_vars $INDEX )
+g_vars=$( cat $INDEX | get_vars )
 
 # Go through every file in template directory
 for i in $( find "$TEMPLATES_DIR" -type f ); do
@@ -82,7 +82,7 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
     if [ -n "$csd_dir" ]
     then
 
-        content=$( cat "$i" )
+        content=$( cat $i )
 
         # Replaces tags with values in current template
         content=$( echo "$content" | sed \
@@ -109,13 +109,13 @@ for i in $( find "$TEMPLATES_DIR" -type f ); do
         -e "s/@color0@/$color0/g" )
 
         # Applies global variables to content
-        content=$( apply_vars "$g_vars" "$content" )
+        content=$( echo "$content" | apply_vars "$g_vars" )
 
         # Gets local variables, if present
-        l_vars=$( get_vars "$content" )
+        l_vars=$( echo "$content" | get_vars )
 
         # Applies local variables to content
-        content=$( apply_vars "$l_vars" "$content" )
+        content=$( echo "$content" | apply_vars "$l_vars" )
 
         # Writes sanitised content in the specified directory
         echo "$content" | content_sec > $csd_dir

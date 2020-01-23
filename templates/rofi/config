@@ -1,5 +1,6 @@
-// CSDdir:~/.config/rofi/config.rasi
-
+[variables]
+CSDdir = ~/.config/rofi/config.rasi
+[content]
 configuration {
 	combi-modi:     "drun,run";
 	sidebar-mode:   false;
