@@ -3,6 +3,26 @@
 CUR_DIR=$( dirname "$(readlink -f "$0")" )
 TEMPLATES_DIR=$CUR_DIR/templates
 
+# Flags parsing
+while test $# -gt 0; do
+    case "$1" in
+    -h|--help)
+        echo ""
+        echo -e "Usage: for now, simply execute it"
+        echo -e "\033[1mCSDealer\033[0m is a kind of \"config file wrapper\" that adds variables, Xresources colors, and other cool stuff to program config files, using templates."
+        echo ""
+        echo -e "Options:"
+        echo -e "-h, --help                 show this message"
+        echo ""
+        echo ""
+        echo -e "\033[1mFor now\033[0m, more information at: https://github.com/PadronToni/CSDealer"
+        echo ""
+        exit 0
+    ;;
+    esac
+done
+
+
 # Checks if template dir exist, if not, exit
 if [ ! -d $TEMPLATES_DIR ]
 then
