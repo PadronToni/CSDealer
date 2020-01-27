@@ -41,8 +41,8 @@ declare -a colors
 # Extracts base 16 colors, foreground and background from Xresources and assing them to "colors" array
 get_xres_colors ()  {
   local xres=$( xrdb -query )
-  local sas=$( echo "$xres" | awk '/color.*:/' | sort -t r -k2 -n | awk '{print $2}')
-  sas+=$( echo  ""; echo "$xres" | awk '/.*ground:/' | sort | awk '{print $2}' )
+  local sas=$( echo "$xres" | awk '/\*\.?color.*:/' | sort -t r -k2 -n | awk '{print $2}')
+  sas+=$( echo  ""; echo "$xres" | awk '/\*\.?.*ground:/' | sort | awk '{print $2}' )
 
   for i in $sas; do
     colors+=($i)
@@ -51,7 +51,7 @@ get_xres_colors ()  {
 
 # Extracts font from Xresources and assign it to font variable
 get_xres_font () {
-  font=$(xrdb -query | awk ' /font-regular:/ {print $2; exit}')
+  font=$(xrdb -query | awk ' /^\*\.?font:/ {print $2; exit}')
 }
 
 # Extracts CSDdir from the current file and if it finds `~` replaces it with home directory
