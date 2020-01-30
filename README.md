@@ -110,3 +110,7 @@ When executed, **CSD** process every file in `/template` folder (even if there a
 ## Notice
 
 It works only with **.Xresources** file, because **CSD** uses `xrdb -query` command to gather color values.
+
+## License
+
+This project is licensed under the temrs of the GNU General Public License v2.0.
