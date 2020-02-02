@@ -113,4 +113,4 @@ It works only with **.Xresources** file, because **CSD** uses `xrdb -query` comm
 
 ## License
 
-This project is licensed under the temrs of the GNU General Public License v2.0.
+This project is licensed under the temrs of the GNU General Public License v3.0.
